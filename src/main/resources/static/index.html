@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>React + Spring</title>
+</head>
+<body>
+<div id='root'></div>
+
+<script src="https://fb.me/react-15.0.1.js"></script>
+<script src="https://fb.me/react-dom-15.0.1.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script type="text/babel">
+
+
+    var UploadForm = React.createClass({
+        getInitialState: function () {
+            return {
+                file: null,
+                title: null,
+                details: null,
+                error: ""
+            };
+        },
+        onFormSubmit(e) {
+            e.preventDefault() // Stop form submit
+            this.fileUpload(this.state.file, this.state.title, this.state.details);
+        },
+        handleInputChange(event) {
+            const target = event.target;
+            const value = target.type === 'file' ? event.target.files[0] : target.value;
+            const name = target.name;
+
+            this.setState({
+                [name]: value, error: ""
+            });
+        },
+        displayTheError: function (body) {
+            this.setState({file: null, error: body})
+        },
+        fileUpload(file, title, details) {
+            const url = 'http://localhost:9080/api/v1/upload';
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('title', title);
+            formData.append('details', details);
+            const config = {
+                headers: {
+                    'content-type': 'multipart/form-data'
+                }
+            };
+
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                config: config
+            })
+                .then(response => {
+                    return response.text();
+                })
+                .then(responseBodyAsText => {
+                    console.log(responseBodyAsText);
+                    try {
+                        const bodyAsJson = JSON.parse(responseBodyAsText);
+                        return bodyAsJson;
+                    } catch (e) {
+                        Promise.reject({body: responseBodyAsText});
+                    }
+                })
+                .then(json => {
+                    console.log(json);
+                    this.setState({message: JSON.stringify(json)})
+                })
+                .catch(err => {
+                    this.displayTheError(err.body);
+                    return;
+                    throw err;
+                })
+        },
+        render() {
+            return (
+                <form onSubmit={this.onFormSubmit}>
+                    <h1>File Upload</h1>
+                    <input type="file" name="file" onChange={this.handleInputChange}/>
+                    <input type="text" name="title" onChange={this.handleInputChange}/>
+                    <input type="text" name="details" onChange={this.handleInputChange}/>
+                    <button type="submit">Upload</button>
+                    <h3>{this.state.error}</h3>
+                    <h3>{this.state.message}</h3>
+                </form>
+            )
+        }
+    });
+
+    ReactDOM.render(
+        <UploadForm/>, document.getElementById('root')
+    );
+
+
+</script>
+</body>
+</html>
