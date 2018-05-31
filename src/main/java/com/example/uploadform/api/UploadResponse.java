@@ -1,19 +1,13 @@
 package com.example.uploadform.api;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Builder;
+import lombok.Value;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Value
+@Builder
 public class UploadResponse {
-    private String message;
-    private String title;
-    private String details;
-    private String fileName;
-
-    public UploadResponse(String message) {
-        this.message = message;
-    }
+    private final String message;
+    private final String title;
+    private final String details;
+    private final String fileName;
 }

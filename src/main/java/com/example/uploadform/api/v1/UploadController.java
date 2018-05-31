@@ -1,12 +1,12 @@
-package com.example.uploadform.api;
+package com.example.uploadform.api.v1;
 
+import com.example.uploadform.api.UploadResponse;
 import com.example.uploadform.model.FileMetaData;
 import com.example.uploadform.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,40 +17,31 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
-
 @Slf4j
-@RestController
-public class UploadControllerV1 {
-
+@RestController()
+public class UploadController {
 
     private final FileService fileService;
 
-    public UploadControllerV1(FileService fileService) {
+    public UploadController(FileService fileService) {
         this.fileService = fileService;
     }
 
     @RequestMapping(value = "/api/v1/upload", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UploadResponse> uploadFile(@RequestParam("file") MultipartFile file,
                                                      @RequestParam("title") String title,
-                                                     @RequestParam("details") String details,
-                                                     final HttpServletRequest request) {
-
-        log.debug("Uploaded file");
-        log.debug("fileName : " + file.getOriginalFilename());
-        log.debug("contentType : " + file.getContentType());
-        log.debug("contentSize : " + file.getSize());
-        log.debug("title : " + title);
-        log.debug("details : " + details);
+                                                     @RequestParam("details") String details) {
 
         Assert.isTrue(!file.isEmpty(), "File cannot be empty");
 
+        UploadResponse response = UploadResponse.builder().message("Successfully uploaded")
+                .title(title)
+                .details(details)
+                .fileName(file.getOriginalFilename())
+                .build();
 
-        Optional<FileMetaData> fileMetaDataOptional = fileService.storeFile(file, title, details);
-
-        return new ResponseEntity<>(new UploadResponse("Successfully uploaded", title, details, file.getOriginalFilename()), HttpStatus.OK);
-
+        fileService.storeData(file, title, details);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/api/v1/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
