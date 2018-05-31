@@ -46,7 +46,7 @@ server and client apps should be deployed in the same domain (e.g. running behin
 ### API self-documenting
 API is self-documenting using Swagger-generated docs available at:
 ```
-/apidocs
+http://localhost:9080/swagger-ui.html#
 ```
 
 ## Build
@@ -62,6 +62,10 @@ or
 ```
 mvn spring-boot:run
 ```
+
+The application will start by default on port 9080
+
+[http://localhost:9080/swagger-ui.html#](http://localhost:9080/swagger-ui.html#)
 
 ## Usage with cURL
 ```

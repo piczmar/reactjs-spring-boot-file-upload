@@ -1,4 +1,4 @@
-package com.example.uploadform;
+package com.example.uploadform.exception;
 
 import com.example.uploadform.api.ErrorResponse;
 import com.example.uploadform.exception.DataAlreadyExistsException;
