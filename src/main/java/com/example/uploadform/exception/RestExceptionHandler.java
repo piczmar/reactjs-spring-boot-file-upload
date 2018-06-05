@@ -13,11 +13,13 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.servlet.http.HttpServletRequest;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -30,10 +32,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ErrorResponse(BAD_REQUEST, "Malformed JSON request", ex));
     }
 
-
     @ExceptionHandler(DataAlreadyExistsException.class)
     protected ResponseEntity<Object> handleDuplicateFile(DataAlreadyExistsException ex) {
         ErrorResponse ErrorResponse = new ErrorResponse(BAD_REQUEST, "Duplicate file upload", ex);
+        return buildResponseEntity(ErrorResponse);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    protected ResponseEntity<Object> handleTooLargeFile(MaxUploadSizeExceededException ex) {
+        ErrorResponse ErrorResponse = new ErrorResponse(BAD_REQUEST, "File too large", ex);
         return buildResponseEntity(ErrorResponse);
     }
 
@@ -46,7 +53,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             throw e;
         }
 
-        ErrorResponse ErrorResponse = new ErrorResponse(NOT_FOUND, e);
+        ErrorResponse ErrorResponse = new ErrorResponse(INTERNAL_SERVER_ERROR, e);
         return buildResponseEntity(ErrorResponse);
     }
 

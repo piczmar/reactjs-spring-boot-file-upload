@@ -1,13 +1,8 @@
 # Upload Form - Server
 Spring Boot application which provides API to upload files.
- 
-* Metrics via DataDog (statsd, precisely), including:
-    * The app's version
-    * The bundle's own version
-* JSON-formatted logging
-* API bindings for Mako environment variables
 
-Future generations of the bundle may provide additional functionality.
+Files are stored on server filesystem.
+Metadata of files is stored in embedded H2 database.
 
 ## Design considerations
 ### File storage
@@ -45,9 +40,11 @@ server and client apps should be deployed in the same domain (e.g. running behin
 
 ### API self-documenting
 API is self-documenting using Swagger-generated docs available at:
-```
-http://localhost:9080/swagger-ui.html#
-```
+[http://localhost:9080/swagger-ui.html#](http://localhost:9080/swagger-ui.html#)
+
+## Configuration
+Configure server port, max uploaded file size, file storage location, log4j configuration 
+and other properties in `src/main/resources/application.properties`
 
 ## Build
 ```
@@ -146,4 +143,3 @@ curl -H 'Content-Type:application/json` http://localhost:9080/api/v1/list?page=0
 
 It will query first page of entries with 1 entry per page.
 Default page size (when no `size` parameter is provided) is 10 entries.
-
