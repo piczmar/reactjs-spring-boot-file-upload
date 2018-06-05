@@ -42,14 +42,15 @@ public class DiskStorageProvider implements StorageProvider {
     }
 
     @Override
-    public String getLocation() throws LocationNotFoundException {
+    public String getLocation() {
         try {
             long foldersCount = countFiles(rootFolder);
             String currentFolderName = String.valueOf(foldersCount);
             long filesCountWithinFolder = countFiles(rootFolder + File.separator + currentFolderName);
-            return filesCountWithinFolder > maxFilesCount ?
+            return rootFolder + File.separator +
+                    (filesCountWithinFolder > maxFilesCount ?
                     String.valueOf(foldersCount + 1) :
-                    currentFolderName;
+                    currentFolderName);
         } catch (IOException e) {
             throw new LocationNotFoundException();
         }

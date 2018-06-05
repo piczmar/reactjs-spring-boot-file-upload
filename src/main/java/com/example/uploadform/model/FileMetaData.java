@@ -28,4 +28,6 @@ public class FileMetaData {
 
     private long createdAt;
 
+    private String location;
+
 }

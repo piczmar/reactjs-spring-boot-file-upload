@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -36,18 +37,19 @@ public class FileService {
         if (metadataFromDb.isPresent()) {
             throw new DataAlreadyExistsException("File with name " + fileName + " has been already uploaded");
         }
-
-        FileMetaData savedData = fileMetaDataRepository.save(extractMetadata(file, title, details));
+        String location = getTargetFileLocation(file.getOriginalFilename());
+        FileMetaData savedData = fileMetaDataRepository.save(extractMetadata(file, title, details, location));
         byte[] content = extractContent(file);
         storageProvider.store(file.getOriginalFilename(), content);
         return savedData;
     }
 
+
     public Page<FileMetaData> getAllMetaData(Pageable pageable) {
         return fileMetaDataRepository.findAll(pageable);
     }
 
-    private FileMetaData extractMetadata(MultipartFile file, String title, String details) {
+    private FileMetaData extractMetadata(MultipartFile file, String title, String details, String location) {
         return FileMetaData.builder()
                 .name(file.getOriginalFilename())
                 .contentSize(file.getSize())
@@ -55,6 +57,7 @@ public class FileService {
                 .title(title)
                 .details(details)
                 .createdAt(System.currentTimeMillis())
+                .location(location)
                 .build();
     }
 
@@ -66,4 +69,7 @@ public class FileService {
         }
     }
 
+    private String getTargetFileLocation(String originalFilename) {
+        return storageProvider.getLocation() + File.separator + originalFilename;
+    }
 }
