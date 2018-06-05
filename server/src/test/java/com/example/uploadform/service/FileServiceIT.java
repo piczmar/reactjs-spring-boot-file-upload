@@ -75,6 +75,3 @@ public class FileServiceIT {
     }
 
 }
-//https://www.academind.com/learn/react/snippets/image-upload/
-//
-//        https://dzone.com/articles/upload-large-file-in-spring-boot-2-application-usi
